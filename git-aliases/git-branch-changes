@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+source ~/scripts/colorize.sh
+source ~/scripts/confirm.sh
+
+# git branch changes - see what the current branch has that the base branch does not
+gbc() {
+  local current_branch=$(git rev-parse --abbrev-ref HEAD)
+  local branch="$@"
+  info "see what $(colorize Bold)$(colorize Yellow $current_branch) (current branch)$(colorize Reset) has that $(colorize Cyan)$branch$(colorize Reset) does not"
+  git lg $branch..$current_branch
+}
+
+gbc "$1"

@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+source ~/scripts/colorize.sh
+source ~/scripts/confirm.sh
+
+function moveCommit() {
+    if [[ -z $1 ]]
+    then
+        err "'commit' required\nUsage: git move-commit <commit> <source_branch> <destination_branch>"
+        return
+    fi
+    if [[ -z $2 ]]
+    then
+        err "'source_branch' required\nUsage: git move-commit <commit> <source_branch> <destination_branch>"
+        return
+    fi
+    if [[ -z $3 ]]
+    then
+        err "'destination_branch' required\nUsage: git move-commit <commit> <source_branch> <destination_branch>"
+        return
+    fi
+
+    local first=$1
+    local last=$first
+    local source=$2
+    local destination=$3
+    local SHA_SHORT=$(git rev-parse --short "$first")
+
+    
+    info "preparing to move commit ($SHA_SHORT) from $(colorize Cyan)$source$(colorize Reset) ⟶  $(colorize Bold)$(colorize Yellow noonce) (temp branch)$(colorize Reset)"
+    local result=$(confirm "move commit?")
+    if [[ $result -eq 1 ]]
+    then
+        git branch nonce $last
+        git rebase -p --onto $destination $first^ nonce
+
+        warn "preparing to move commit ($SHA_SHORT) from $(colorize Cyan)$source$(colorize Reset) ⟶  $(colorize Bold)$(colorize Yellow $destination)$(colorize Reset)"
+        result=$(confirm "look good?")
+        if [[ $result -eq 1 ]]
+        then
+            git checkout $destination
+            git reset --hard nonce
+            git branch -d nonce
+
+            result=$(confirm "look good?")
+            if [[ $result -eq 1 ]]
+            then
+                info "cleaning up"
+                git rebase -p --onto $first^ $last $source
+            fi
+        else
+            git branch -D nonce
+        fi
+    fi
+}
+
+moveCommit $@

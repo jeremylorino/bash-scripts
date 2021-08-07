@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+source ~/scripts/colorize.sh
+source ~/scripts/confirm.sh
+
+function pruneBranches() {
+    # git remote prune origin
+    git fetch -p
+    local branches=$(git branch -vv | grep ': gone]' | awk '{print $1}')
+    echo -e $branches | tr " " "\n"
+    
+    local result=$(confirm "delete local branches?")
+    if [[ $result -eq 1 ]]
+    then
+        echo $branches | xargs -r git branch -D
+    fi
+}
+
+pruneBranches

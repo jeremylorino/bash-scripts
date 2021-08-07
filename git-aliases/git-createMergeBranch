@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+source ~/scripts/colorize.sh
+source ~/scripts/confirm.sh
+
+function __createMergeBranch_formatBranch() {
+    echo "$1" | tr "/" "-"
+}
+
+function createMergeBranch() {
+    local dest_branch_raw="$(git rev-parse --abbrev-ref HEAD)"
+    local source_branch_raw="$@"
+    local dest_branch=$(__createMergeBranch_formatBranch "$dest_branch_raw")
+    local source_branch=$(__createMergeBranch_formatBranch "$source_branch_raw")
+    local new_branch="merge/$source_branch-to-$dest_branch"
+    info "prepare merge branch $(colorize Cyan)$source_branch_raw$(colorize Reset) ⟶  $(colorize Bold)$(colorize Yellow $dest_branch_raw) (current branch)$(colorize Reset)"
+
+    local result=$(confirm "create branch? $(colorize White)($(colorize Cyan)$new_branch$(colorize White))")
+    if [[ $result -eq 1 ]]
+    then
+        info "creating branch $new_branch..."
+        git checkout -b $new_branch
+    fi
+}
+
+createMergeBranch "$1"

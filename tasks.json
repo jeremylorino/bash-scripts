@@ -1,0 +1,119 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "stub: all",
+            "type": "shell",
+            "command": "echo stub all db",
+            "dependsOn": ["stub: db", "stub: test_db"],
+            "dependsOrder": "sequence",
+            "problemMatcher": []
+        },
+        {
+            "label": "stub: db",
+            "type": "shell",
+            "command": "powershell",
+            "windows": {
+                "options": {
+                    "cwd": "${workspaceFolder}\\Build"
+                }
+            },
+            "linux": {
+                "options": {
+                    "cwd": "${workspaceFolder}/Build"
+                }
+            },
+            "args": [
+                "-ExecutionPolicy",
+                "Unrestricted",
+                "-File",
+                "build.ps1",
+                "--target=\"Rebuild PostgreSQL Database\"",
+                "--sqlDirectory=\"../ETL/\"",
+                "--postgresDatabase=\"discovery_test\""
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "stub: test_db",
+            "type": "shell",
+            "command": "powershell",
+            "windows": {
+                "options": {
+                    "cwd": "${workspaceFolder}\\Build"
+                }
+            },
+            "linux": {
+                "options": {
+                    "cwd": "${workspaceFolder}/Build"
+                }
+            },
+            "args": [
+                "-ExecutionPolicy",
+                "Unrestricted",
+                "-File",
+                "build.ps1",
+                "--target=\"Rebuild PostgreSQL Database\"",
+                "--sqlDirectory=\"../ETL/\"",
+                "--postgresDatabase=\"discovery_stubs\""
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "Build - LimsWeb",
+            "dependsOn": ["watch:ts - LimsWeb", "build:dev - LimsWeb"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "watch:ts - LimsWeb",
+            "type": "npm",
+            "script": "watch:ts",
+            "path": "LimsWeb/src/",
+            "problemMatcher": ["$tsc-watch"],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": true,
+                "clear": false,
+                "group": "LimsWeb"
+            }
+        },
+        {
+            "label": "build:dev - LimsWeb",
+            "type": "npm",
+            "script": "build:dev",
+            "path": "LimsWeb/src/",
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": true,
+                "clear": false,
+                "group": "LimsWeb"
+            }
+        }
+    ]
+}
